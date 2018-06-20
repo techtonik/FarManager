@@ -1,5 +1,12 @@
 #!/bin/bash
 
+ROOT=$(dirname $0)/../..
+REPO=far.git
+if [ ! -d "$REPO" ]; then
+        REPO=$ROOT
+fi
+
+
 function benc2 {
 LNG=$1
 L=$2
@@ -8,8 +15,8 @@ cd ${LNG} || return 1
 wine "C:/Program Files (x86)/HTML Help Workshop/hhc.exe" plugins${L}.hhp
 
 ( \
-	cp -f FarEncyclopedia.${LNG}.chm ../../../../outfinalnew32/Encyclopedia/ && \
-	cp -f FarEncyclopedia.${LNG}.chm ../../../../outfinalnew64/Encyclopedia/ \
+	cp -vf FarEncyclopedia.${LNG}.chm $ROOT/outfinalnew32/Encyclopedia/ && \
+	cp -vf FarEncyclopedia.${LNG}.chm $ROOT/outfinalnew64/Encyclopedia/ \
 ) || return 1
 
 cd ..
@@ -25,22 +32,23 @@ wine "C:/src/enc/tools/lua/lua.exe" "C:/src/enc/tools/lua/scripts/tp2hh.lua" "..
 wine "C:/Program Files (x86)/HTML Help Workshop/hhc.exe" ${1}.hhp
 
 ( \
-	cp -f ${1}.chm ../../../../outfinalnew32/Encyclopedia/ && \
-	cp -f ${1}.chm ../../../../outfinalnew64/Encyclopedia/ \
+	cp -f ${1}.chm $ROOT/outfinalnew32/Encyclopedia/ && \
+	cp -f ${1}.chm $ROOT/outfinalnew64/Encyclopedia/ \
 ) || return 1
 
 cd ..
 
 }
 
-rm -fR enc
+rm -fR $ROOT/build
+mkdir $ROOT/build
 
-cp -R far.git/enc ./ || exit 1
+cp -R $ROOT/enc $ROOT/build/ || exit 1
 
-mkdir -p outfinalnew32/Encyclopedia
-mkdir -p outfinalnew64/Encyclopedia
+mkdir -p $ROOT/outfinalnew32/Encyclopedia
+mkdir -p $ROOT/outfinalnew64/Encyclopedia
 
-pushd enc/tools || exit 1
+pushd build/enc/tools || exit 1
 python tool.make_chm.py
 cd ../build/chm
 
